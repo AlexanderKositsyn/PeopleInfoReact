@@ -12,7 +12,7 @@ export default class PeopleFilterTableHeadCell extends Component {
     return (
       <th className="people-info__table-header">
         {title}
-        <div className="people-info__previous-next" data-sort="{title}" />
+        <div className="people-info__previous-next" data-sort={title} />
       </th>
     );
   }

@@ -1,18 +1,12 @@
 import React, { Component } from "react";
 
 export default class PeopleFilterTableRow extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      dataCell: this.props.data,
-      key: this.props.key
-    };
-  }
   render() {
-    let { dataCell } = this.state;
+    let dataCell = this.props.data,
+      dataKey = this.props.dataKey;
 
     return (
-      <td className="people-info__table-cell" data-sort="{key}">
+      <td className="people-info__table-cell" data-sort={dataKey}>
         {dataCell}
       </td>
     );
