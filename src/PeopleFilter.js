@@ -2,35 +2,22 @@ import React, { Component } from "react";
 import PeopleFilterTableHeadCell from "./components/PeopleFilterTableHeadCell.js";
 import PeopleFilterTableRow from "./components/PeopleFilterTableRow";
 import PeopleFilterPaginationButton from "./components/PeopleFilterPaginationButton";
+import { connect } from "react-redux";
+import { inputAction } from "./actions/inputAction";
+import { paginationAction } from "./actions/paginationAction";
 
 class PeopleFilter extends Component {
-  // для сохранения состояний создадим в компоненте App state в котором и будет содержаться состояние всего приложения
-  // конструктор вызывается только раз во время создания экземпляра, потом он не вызывается
-  constructor(props) {
-    super(props);
-    this.state = {
-      data: props.data,
-      rootElement: document.getElementById(props.rootElement),
-      searchInputValue: "",
-      sortValue: "",
-      isSortForward: void 0,
-      paginatioValue: 1
-    };
-  }
-
   //обработчик на кнопки пагинации
   handlePaginationListButtons = e => {
     if (e.target.tagName === "BUTTON") {
-      this.setState({
-        paginatioValue: parseInt(e.target.textContent, 10)
-      });
+      this.props.dispatch(paginationAction(parseInt(e.target.textContent, 10)));
     }
   };
 
   // обработчик на кпопку next в пагинации
   handlePaginationListNext = e => {
     if (e.target.tagName === "BUTTON") {
-      this.state.paginatioValue !== this.amoutPagination
+      this.state.paginatioValue !== this.state.amoutPagination
         ? this.setState({
             paginatioValue: this.state.paginatioValue + 1
           })
@@ -52,10 +39,8 @@ class PeopleFilter extends Component {
   // обработчик для инпута search
   handleInputSearch = e => {
     // изменяем состояние приложения
-    this.setState({
-      searchInputValue: e.target.value,
-      paginatioValue: 1
-    });
+    // эта функция отправляет action в store
+    this.props.dispatch(inputAction(e.target.value, 1));
   };
 
   //обработчик на кнопки sort
@@ -82,17 +67,8 @@ class PeopleFilter extends Component {
 
   render() {
     console.log(this);
-
-    const {
-      data,
-      sortValue,
-      searchInputValue,
-      paginatioValue,
-      rootElement,
-      isSortForward
-    } = this.state;
     // Возьмем первый объект в data
-    const headerObject = this.state.data[0];
+    const headerObject = this.props.data[0];
     // Генерим список th и потом вставим их в таблицу
     const headerCells = [];
     for (let key in headerObject) {
@@ -101,23 +77,23 @@ class PeopleFilter extends Component {
 
     // сначала фильтруем data по состоянию приложения
     let filteredData = [];
-    filteredData = data.filter(item => {
+    filteredData = this.props.data.filter(item => {
       //найдем совпадния в объекте
       let strOfValues = "";
       for (let key in item) {
         strOfValues += item[key];
       }
-      return strOfValues.indexOf(searchInputValue) >= 0;
+      return strOfValues.indexOf(this.props.searchInputValue) >= 0;
     });
 
     // если стоит сортировка, то сортируем согласно сортировке по определенной колонке
     // а значит формируем новый массив
-    if (sortValue) {
-      console.log(sortValue);
+    if (this.props.sortValue) {
+      console.log(this.props.sortValue);
       let sortFunction = (a, b) => {
         //соханим значения
-        let value1 = a[sortValue],
-          value2 = b[sortValue];
+        let value1 = a[this.props.sortValue],
+          value2 = b[this.props.sortValue];
         // если это валюта , то сравниваем другие строки
         if (typeof value1 === "string")
           if (value1.indexOf("$") >= 0 && value2.indexOf("$") >= 0) {
@@ -143,7 +119,7 @@ class PeopleFilter extends Component {
       filteredData.sort(sortFunction);
 
       // если выключен флаг forward sort то , делаем обратную сортировку
-      !this.state.isSortForward ? filteredData.reverse() : void 0;
+      !this.props.isSortForward ? filteredData.reverse() : void 0;
     }
     console.log(filteredData);
 
@@ -152,26 +128,28 @@ class PeopleFilter extends Component {
     // Генерация строк происходит для текущей пагинации в зависимоти от paginatioValue
     let tableRows = [];
     filteredData.map((item, index, array) => {
-      if (index >= paginatioValue * 10 - 10 && index <= paginatioValue * 10 - 1)
+      if (
+        index >= this.props.paginatioValue * 10 - 10 &&
+        index <= this.props.paginatioValue * 10 - 1
+      )
         return tableRows.push(<PeopleFilterTableRow key={index} data={item} />);
 
       return void 0;
     });
 
     // раскрасим таблицу в зависимости от выбанной сортировки
-    let allCells = rootElement.querySelectorAll("td");
+    let allCells = this.props.rootElement.querySelectorAll("td");
     for (let i = 1; i < allCells.length; ++i) {
       allCells[i].style.backgroundColor = "";
     }
-    let column = rootElement.querySelectorAll(`[data-sort='${sortValue}']`);
+    let column = this.props.rootElement.querySelectorAll(
+      `[data-sort='${this.props.sortValue}']`
+    );
     for (let i = 1; i < column.length; ++i) {
       i % 2
         ? (column[i].style.backgroundColor = "#F0E0E0")
         : (column[i].style.backgroundColor = "#F0F0F0");
     }
-
-    // в зависимости от кол-ва элементов генерируем необходимые пагинационные кнопки
-    // если 0 то ставим хотя бы одну пагинацию
     this.amoutPagination = parseInt(filteredData.length / 10, 10) + 1;
     //генерированные элементы в пагинацию
     let paginationButtonArray = [];
@@ -180,14 +158,16 @@ class PeopleFilter extends Component {
         <PeopleFilterPaginationButton
           key={i}
           number={i}
-          paginatioValue={paginatioValue}
+          paginatioValue={this.props.paginatioValue}
         />
       );
     }
 
     // заменим на активный класс кнопку сортировки(это в заголвке таблицы)
-    let headerRow = rootElement.querySelectorAll(".people-info__previous-next");
-    if (isSortForward === true) {
+    let headerRow = this.props.rootElement.querySelectorAll(
+      ".people-info__previous-next"
+    );
+    if (this.props.isSortForward === true) {
       for (let i = 0; i < headerRow.length; ++i) {
         headerRow[i].classList.remove("forward");
         headerRow[i].classList.remove("reverse");
@@ -250,4 +230,9 @@ class PeopleFilter extends Component {
   }
 }
 
-export default PeopleFilter;
+// возвращаем обетку, которая будет соединять redux и react
+// она определяет какие св ва из state попадут в пропсы компонента
+// поэтому в компоненте мы будем иметь доступ к состоянию через props
+export default connect(state => {
+  return { ...state };
+})(PeopleFilter);

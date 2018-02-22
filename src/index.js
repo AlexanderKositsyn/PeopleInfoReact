@@ -1,10 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import styled from "styled-components";
+import { Provider } from "react-redux";
+import { createStore } from "redux";
 import "./index.css";
 import PeopleFilter from "./PeopleFilter";
 import registerServiceWorker from "./registerServiceWorker";
 import { data1, data2 } from "./data";
+import reducer from "./reducers";
 
 const PeopleFilterStyled = styled.div`
   font-family: Helvetica, sans-serif;
@@ -153,18 +156,27 @@ const PeopleFilterStyled = styled.div`
   }
 `;
 
-ReactDOM.render(
-  <PeopleFilterStyled>
-    <PeopleFilter data={data1} rootElement={"root"} />
-  </PeopleFilterStyled>,
-  document.getElementById("root")
-);
+let initialState = {
+  data: data1,
+  rootElement: document.getElementById("root"),
+  searchInputValue: "",
+  sortValue: "",
+  isSortForward: void 0,
+  paginatioValue: 1,
+  amoutPagination: 1
+};
+//создаем store для redux
+// нужно передать в него reducer-ы и если нужно начальное состояние приложения
+let store = createStore(reducer, initialState);
 
+//тут нужно связать react и redux(redux может использвоваться и не в react, а в обычном коде)
 ReactDOM.render(
-  <PeopleFilterStyled>
-    <PeopleFilter data={data2} rootElement={"app"} />
-  </PeopleFilterStyled>,
-  document.getElementById("app")
+  <Provider store={store}>
+    <PeopleFilterStyled>
+      <PeopleFilter data={data1} rootElement={"root"} />
+    </PeopleFilterStyled>
+  </Provider>,
+  document.getElementById("root")
 );
 
 registerServiceWorker();
