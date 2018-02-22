@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-export default class PeopleFilterPaginationButton extends Component {
+export default class PaginationButton extends Component {
   render() {
     let number = this.props.number,
       paginatioValue = this.props.paginatioValue;

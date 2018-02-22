@@ -1,11 +1,11 @@
 import React, { Component } from "react";
-import PeopleFilterTableHeadCell from "./components/PeopleFilterTableHeadCell.js";
-import PeopleFilterTableRow from "./components/PeopleFilterTableRow";
-import PeopleFilterPaginationButton from "./components/PeopleFilterPaginationButton";
+import HeadRow from "./HeadRow";
+import TableRow from "./TableRow";
+import PaginationList from "./PaginationList";
 import { connect } from "react-redux";
-import { inputAction } from "./actions/inputAction";
-import { paginationAction } from "./actions/paginationAction";
-import { sortAction } from "./actions/sortAction";
+import { inputAction } from "../actions/inputAction";
+import { paginationAction } from "../actions/paginationAction";
+import { sortAction } from "../actions/sortAction";
 
 class PeopleFilter extends Component {
   //обработчик на кнопки пагинации
@@ -59,13 +59,6 @@ class PeopleFilter extends Component {
 
   render() {
     console.log(this);
-    // Возьмем первый объект в data
-    const headerObject = this.props.data[0];
-    // Генерим список th и потом вставим их в таблицу
-    const headerCells = [];
-    for (let key in headerObject) {
-      headerCells.push(<PeopleFilterTableHeadCell key={key} data={key} />);
-    }
 
     // сначала фильтруем data по состоянию приложения
     let filteredData = [];
@@ -124,7 +117,7 @@ class PeopleFilter extends Component {
         index >= this.props.paginatioValue * 10 - 10 &&
         index <= this.props.paginatioValue * 10 - 1
       )
-        return tableRows.push(<PeopleFilterTableRow key={index} data={item} />);
+        return tableRows.push(<TableRow key={index} data={item} />);
 
       return void 0;
     });
@@ -143,17 +136,6 @@ class PeopleFilter extends Component {
         : (column[i].style.backgroundColor = "#F0F0F0");
     }
     this.amoutPagination = parseInt(filteredData.length / 10, 10) + 1;
-    //генерированные элементы в пагинацию
-    let paginationButtonArray = [];
-    for (let i = 1; i <= this.amoutPagination; ++i) {
-      paginationButtonArray.push(
-        <PeopleFilterPaginationButton
-          key={i}
-          number={i}
-          paginatioValue={this.props.paginatioValue}
-        />
-      );
-    }
 
     // заменим на активный класс кнопку сортировки(это в заголвке таблицы)
     let headerRow = this.props.rootElement.querySelectorAll(
@@ -188,12 +170,10 @@ class PeopleFilter extends Component {
         </div>
         <table className="people-info__table">
           <tbody>
-            <tr
-              className="people-info__table-row people-info__table-row--header"
+            <HeadRow
               onClick={this.handleTableHeader}
-            >
-              {headerCells}
-            </tr>
+              data={this.props.data[0]}
+            />
             {tableRows}
           </tbody>
         </table>
@@ -204,12 +184,11 @@ class PeopleFilter extends Component {
           >
             Previous
           </button>
-          <ul
-            className="people-info__pagination-list"
+          <PaginationList
             onClick={this.handlePaginationListButtons}
-          >
-            {paginationButtonArray}
-          </ul>
+            amoutPagination={this.amoutPagination}
+            paginatioValue={this.props.paginatioValue}
+          />
           <button
             className="people-info__next"
             onClick={this.handlePaginationListNext}

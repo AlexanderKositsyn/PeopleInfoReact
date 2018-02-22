@@ -1,10 +1,13 @@
+/// LIB
 import React from "react";
 import ReactDOM from "react-dom";
 import styled from "styled-components";
 import { Provider } from "react-redux";
 import { createStore } from "redux";
+/// STYLE
 import "./index.css";
-import PeopleFilter from "./PeopleFilter";
+/// MODULES
+import PeopleFilter from "./components/PeopleFilter";
 import registerServiceWorker from "./registerServiceWorker";
 import { data1, data2 } from "./data";
 import reducer from "./reducers";
@@ -161,9 +164,8 @@ let initialState = {
   rootElement: document.getElementById("root"),
   searchInputValue: "",
   sortValue: "",
-  isSortForward: void 0,
-  paginatioValue: 1,
-  amoutPagination: 1
+  isSortForward: undefined,
+  paginatioValue: 1
 };
 //создаем store для redux
 // нужно передать в него reducer-ы и если нужно начальное состояние приложения
