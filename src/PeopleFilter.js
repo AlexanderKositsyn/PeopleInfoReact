@@ -5,6 +5,7 @@ import PeopleFilterPaginationButton from "./components/PeopleFilterPaginationBut
 import { connect } from "react-redux";
 import { inputAction } from "./actions/inputAction";
 import { paginationAction } from "./actions/paginationAction";
+import { sortAction } from "./actions/sortAction";
 
 class PeopleFilter extends Component {
   //обработчик на кнопки пагинации
@@ -17,10 +18,8 @@ class PeopleFilter extends Component {
   // обработчик на кпопку next в пагинации
   handlePaginationListNext = e => {
     if (e.target.tagName === "BUTTON") {
-      this.state.paginatioValue !== this.state.amoutPagination
-        ? this.setState({
-            paginatioValue: this.state.paginatioValue + 1
-          })
+      this.props.paginatioValue !== this.amoutPagination
+        ? this.props.dispatch(paginationAction(this.props.paginatioValue + 1))
         : void 0;
     }
   };
@@ -28,10 +27,8 @@ class PeopleFilter extends Component {
   // обработчик на кпопку previous в пагинации
   handlePaginationListPrevious = e => {
     if (e.target.tagName === "BUTTON") {
-      this.state.paginatioValue !== 1
-        ? this.setState({
-            paginatioValue: this.state.paginatioValue - 1
-          })
+      this.props.paginatioValue !== 1
+        ? this.props.dispatch(paginationAction(this.props.paginatioValue - 1))
         : void 0;
     }
   };
@@ -48,20 +45,15 @@ class PeopleFilter extends Component {
     if (e.target.tagName === "DIV") {
       // сравниваем новое значение и старое значение
       if (
-        this.state.sortValue === e.target.dataset.sort ||
-        !this.state.sortValue
+        this.props.sortValue === e.target.dataset.sort ||
+        !this.props.sortValue
       ) {
-        this.setState({
-          isSortForward: !this.state.isSortForward
-        });
+        this.props.dispatch(
+          sortAction(e.target.dataset.sort, !this.props.isSortForward)
+        );
       } else {
-        this.setState({
-          isSortForward: true
-        });
+        this.props.dispatch(sortAction(e.target.dataset.sort, true));
       }
-      this.setState({
-        sortValue: e.target.dataset.sort
-      });
     }
   };
 

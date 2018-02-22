@@ -173,7 +173,7 @@ let store = createStore(reducer, initialState);
 ReactDOM.render(
   <Provider store={store}>
     <PeopleFilterStyled>
-      <PeopleFilter data={data1} rootElement={"root"} />
+      <PeopleFilter />
     </PeopleFilterStyled>
   </Provider>,
   document.getElementById("root")
